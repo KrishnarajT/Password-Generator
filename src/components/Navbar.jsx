@@ -1,9 +1,6 @@
 import React from "react";
-import '../input.css';
+import "../input.css";
 
 export function Navbar() {
-    return (
-        <div className="">
-        hi</div>
-    )
+	return <div className="bg-green-100">hi hello</div>;
 }

@@ -752,20 +752,6 @@ html{
   --tw-backdrop-sepia:  ;
 }
 
-@media (hover:hover){
-  .table tr.hover:hover,
-  .table tr.hover:nth-child(even):hover{
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b2) / var(--tw-bg-opacity));
-  }
-
-  .table-zebra tr.hover:hover,
-  .table-zebra tr.hover:nth-child(even):hover{
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b3) / var(--tw-bg-opacity));
-  }
-}
-
 .input{
   flex-shrink: 1;
   height: 3rem;
@@ -1172,9 +1158,14 @@ html{
   margin-right: auto;
 }
 
-.text-5xl{
-  font-size: 3rem;
-  line-height: 1;
+.bg-green-100{
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 252 231 / var(--tw-bg-opacity));
+}
+
+.text-3xl{
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 
 .text-black{
