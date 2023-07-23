@@ -1,19 +1,13 @@
-import React, { useContext, useEffect } from "react";
-import QuoteContextProvider from "./contexts/quoteContext";
-import Quote from "./components/Quote";
-import ImageContextProvider from "./contexts/ImageContext";
-import ContainerDiv from "./components/ContainerDiv";
+import React, {useContext, useEffect} from "react";
+import {Navbar} from "./components/Navbar";
+
 function App() {
-  return (
-    <div className="App">
-      <QuoteContextProvider>
-        <ImageContextProvider>
-          <ContainerDiv />
-          <Quote />
-        </ImageContextProvider>
-      </QuoteContextProvider>
-    </div>
-  );
+    return (
+        <div className="App text-5xl text-black">
+            hiiii
+            <Navbar/>
+        </div>
+    );
 }
 
 export default App;
