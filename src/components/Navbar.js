@@ -2,68 +2,76 @@ import React, { useEffect } from "react";
 import "../input.css";
 import "../style.css";
 import { themeChange } from "theme-change";
-// import the sun icon from heroicons
+
 import {
 	SunIcon,
 	MoonIcon,
-	BookmarkIcon,
-	DevicePhoneMobileIcon,
-	HomeModernIcon,
-	HomeIcon,
+	AcademicCapIcon,
+	HashtagIcon,
+	QuestionMarkCircleIcon,
 	InformationCircleIcon,
 } from "@heroicons/react/24/solid";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export function Navbar() {
 	useEffect(() => {
 		themeChange(false);
 	}, []);
 	return (
-		<div className="navbar bg-secondary rounded-xl text-secondary-content">
+		<div className="navbar bg-secondary rounded-xl text-secondary-content h-24">
 			<div className="">
 				<NavLink to={"/home"}>
-					<a className="btn btn-ghost normal-case text-xl" href=".">
-						Krishnaraj
+					<a className="btn btn-ghost normal-case text-2xl" href=".">
+						Password Gen
 					</a>
 				</NavLink>
 			</div>
-			<div className="flex-row justify-center flex-1">
-				<ul className="menu menu-horizontal px-1">
-					<li>
-						<NavLink to={"/projects"} id="contact_element">
-							<BookmarkIcon className="w-5 h-5" />
-							Projects
+			<div className="flex-row justify-center flex-1 ">
+				<ul className="menu menu-horizontal px-1 first-letter:text-2xl">
+					<li className="text-2xl">
+						<NavLink to={"/random"} id="contact_element">
+							<QuestionMarkCircleIcon className="w-8 h-8" />
+							Random
 						</NavLink>
 					</li>
-					<li>
-						<NavLink to={"/about"} id="contact_element">
-							<InformationCircleIcon className="w-5 h-5" />
-							About
+					<li className="text-2xl">
+						<NavLink to={"/hashed"} id="contact_element">
+							<HashtagIcon className="w-8 h-8" />
+							Hashed
 						</NavLink>
 					</li>
-					<li>
-						<NavLink to={"/contact"} id="contact_element">
-							<DevicePhoneMobileIcon className="w-5 h-5" />
-							Contact
+					<li className="text-2xl">
+						<NavLink to={"/master"} id="contact_element">
+							<AcademicCapIcon className="w-8 h-8" />
+							Master
 						</NavLink>
 					</li>
 				</ul>
 			</div>
 			<div>
-				<ul className="menu menu-horizontal px-1">
+				<ul className="menu menu-horizontal px-1 text-secondary-content">
+					<li className="text-2xl">
+						<NavLink to={"/about"} id="contact_element">
+							<InformationCircleIcon className="w-8 h-8" />
+							About
+						</NavLink>
+					</li>
 					<li>
 						<details>
-							<summary>Theme</summary>
-							<ul className="p-2 bg-base-100">
-								<li data-set-theme="cupcake">
+							<summary className="text-2xl">Theme</summary>
+							<ul className="p-1 text-base-content">
+								<li
+									data-set-theme="cupcake"
+									className="text-xl p-2"
+								>
 									<a>
-										<SunIcon className="w-5 h-5" />
+										<SunIcon className="w-8 h-8" />
 										Light
 									</a>
 								</li>
-								<li>
-									<a data-set-theme="black">
-										<MoonIcon className="w-5 h-4" />
+								<li className="text-xl p-2">
+									<a data-set-theme="business">
+										<MoonIcon className="w-8 h-6" />
 										Dark
 									</a>
 								</li>
