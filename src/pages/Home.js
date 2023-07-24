@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import "../css/Home.css";
 import { ReactComponent as PassSVGLight } from "../assets/undraw_fingerprint_login_re_t71l.svg";
 import { ReactComponent as PassSVGDark } from "../assets/undraw_fingerprint_login_re_t71l.svg";
+import Card from "../components/Card";
 
 import { ReactComponent as Blob } from "../assets/blurry-gradient-haikei.svg";
 import { ThemeContext } from "../context/ThemeContext";
@@ -22,8 +23,13 @@ const Home = () => {
 					<div className="text-9xl titillium">
 						Generate your Own Secure Passwords!
 					</div>
-					<button className="btn btn-secondary rounded-full mt-20 text-5xl p-6 w-96 h-32 rubik shadow-xl">
-						<a href="#def">Try</a>
+					<button
+						className="btn btn-secondary rounded-full mt-20 text-5xl p-6 w-96 h-32 rubik shadow-xl"
+						onClick={() => {
+							window.location.href = "#def";
+						}}
+					>
+						Try
 					</button>
 				</div>
 				{theme === "light" ? <PassSVGLight /> : <PassSVGDark />}
@@ -36,10 +42,20 @@ const Home = () => {
 					secure!
 				</div>
 			</div>
-
-            <section id="def">
-                adjlajdsfl;ajdf
-            </section>
+			<br></br>
+			<br></br>
+			<br></br>
+			<section id="def" className="">
+				<div className="flex flex-row gap-12 p-4 justify-center">
+					<Card id="randomcard" text={""} title={"Random"} />
+					<Card id="hashedcard" text={""} title={"Hashed"} />
+					<Card id="mastercard" text={""} title={"Master"} />
+				</div>
+			</section>
+			<br></br>
+			<br></br>
+			<br></br>
+			<br></br>
 		</div>
 	);
 };
