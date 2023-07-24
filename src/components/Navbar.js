@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import "../input.css";
 import "../style.css";
 import { themeChange } from "theme-change";
+import { ThemeContext } from "../context/ThemeContext";
 
 import {
 	SunIcon,
@@ -17,10 +18,13 @@ export function Navbar() {
 	useEffect(() => {
 		themeChange(false);
 	}, []);
+
+	const { theme, setTheme } = useContext(ThemeContext);
+
 	return (
 		<div className="navbar bg-secondary rounded-xl text-secondary-content h-24">
 			<div className="">
-				<NavLink to={"/home"}>
+				<NavLink to={"/"}>
 					<a className="btn btn-ghost normal-case text-2xl" href=".">
 						Password Gen
 					</a>
@@ -63,14 +67,18 @@ export function Navbar() {
 								<li
 									data-set-theme="cupcake"
 									className="text-xl p-2"
+									onClick={() => setTheme("light")}
 								>
 									<a>
 										<SunIcon className="w-8 h-8" />
 										Light
 									</a>
 								</li>
-								<li className="text-xl p-2">
-									<a data-set-theme="business">
+								<li
+									className="text-xl p-2"
+									onClick={() => setTheme("dark")}
+								>
+									<a data-set-theme="dracula">
 										<MoonIcon className="w-8 h-6" />
 										Dark
 									</a>
