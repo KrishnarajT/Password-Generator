@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import sha256 from "js-sha256";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 
 const Hashed = () => {
 	const [includeSymbols, setIncludeSymbols] = useState(false);
@@ -122,12 +123,19 @@ const Hashed = () => {
 			includeUppercase,
 			base_hash_string
 		);
-		console.log(password);
-		setPassword(password);
+		if (password) {
+			setPassword(password);
+		}
 	}
 
 	function onClickCopyPassword() {
 		navigator.clipboard.writeText(password);
+		// show the toast
+		const toast = document.querySelector(".toast");
+		toast.classList.remove("hidden");
+		setTimeout(() => {
+			toast.classList.add("hidden");
+		}, 2000);
 	}
 
 	return (
@@ -241,10 +249,17 @@ const Hashed = () => {
 					</div>
 				</div>
 				{/* display password */}
-				<div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-96">
-					<div className="flex justify-center p-4">
+				<div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-fit">
+					<div className="flex justify-center p-4 flex-col align-middle items-center">
 						<div className="text-base-content text-5xl p-4">
 							Your Generated Password :
+						</div>
+						<div className="text-base-content text-2xl p-4 text-center">
+							This password is the hash of the text you entered,
+							along with some letters substituted with symbols and
+							uppercase letters, if you included them. This is a
+							secure password, but you can always generate a new
+							one if you don't like it.
 						</div>
 					</div>
 					<div className="flex justify-center p-4">
@@ -260,6 +275,14 @@ const Hashed = () => {
 							Copy to Clipboard
 						</button>
 					</div>
+				</div>
+			</div>
+			<div className="toast toast-end duration-300 transform-gpu ease-in-out hidden">
+				<div className="alert alert-success">
+					<span className="flex items-center gap-4 text-2xl">
+						<CheckBadgeIcon className="w-10 h-10" />
+						Copied to Clipboard!
+					</span>
 				</div>
 			</div>
 		</div>
