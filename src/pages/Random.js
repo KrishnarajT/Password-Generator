@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 
 const Random = () => {
 	const [includeNumbers, setIncludeNumbers] = useState(false);
@@ -83,6 +84,12 @@ const Random = () => {
 
 	function onClickCopyPassword() {
 		navigator.clipboard.writeText(password);
+		// show the toast
+		const toast = document.querySelector(".toast");
+		toast.classList.remove("hidden");
+		setTimeout(() => {
+			toast.classList.add("hidden");
+		}, 2000);
 	}
 
 	return (
@@ -198,6 +205,14 @@ const Random = () => {
 							Copy to Clipboard
 						</button>
 					</div>
+				</div>
+			</div>
+			<div className="toast toast-end duration-300 transform-gpu ease-in-out hidden">
+				<div className="alert alert-success">
+					<span className="flex items-center gap-4 text-2xl">
+						<CheckBadgeIcon className="w-10 h-10" />
+						Copied to Clipboard!
+					</span>
 				</div>
 			</div>
 		</div>
