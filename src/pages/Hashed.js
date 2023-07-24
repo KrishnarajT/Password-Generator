@@ -1,18 +1,16 @@
 import React, { useState } from "react";
+import sha256 from "js-sha256";
 
 const Hashed = () => {
-	const [includeNumbers, setIncludeNumbers] = useState(false);
 	const [includeSymbols, setIncludeSymbols] = useState(false);
 	const [includeUppercase, setIncludeUppercase] = useState(false);
 	const [passwordLength, setPasswordLength] = useState(8);
+	const [base_hash_string, setBaseHashString] = useState();
 	const [password, setPassword] = useState("Generate!");
 
 	const handleCheckboxChange = (event) => {
 		const { name, checked } = event.target;
 		switch (name) {
-			case "includeNumbers":
-				setIncludeNumbers(checked);
-				break;
 			case "includeSymbols":
 				setIncludeSymbols(checked);
 				break;
@@ -29,55 +27,102 @@ const Hashed = () => {
 	};
 	const generatePassword = (
 		length,
-		includeNumbers,
 		includeSymbols,
-		includeUppercase
+		includeUppercase,
+		base_hash_string
 	) => {
+		console.log(includeUppercase, includeSymbols, base_hash_string);
+		if (base_hash_string === undefined) {
+			// base_hash_string = "password"
+			window.my_modal_3.showModal();
+			return;
+		}
 		let result = "";
-		const lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
 		const uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		const numbers = "0123456789";
 		const symbols = "!@#$%&*";
 
-		let characters = lowercaseLetters;
-		if (includeUppercase) {
-			characters += uppercaseLetters;
-		}
-		if (includeNumbers) {
-			characters += numbers;
-		}
-		if (includeSymbols) {
-			characters += symbols;
-		}
-
-		for (let i = 0; i < length; i++) {
-			result += characters.charAt(
-				Math.floor(Math.random() * characters.length)
+		const hash = sha256(base_hash_string);
+		const hashSubstring = hash.substring(hash.length - length);
+		console.log(hash);
+		console.log(hashSubstring);
+		if (includeSymbols && includeUppercase) {
+			// find a random number between 0 and length
+			// replace that character with a random uppercase letter
+			// then replace the next character with a random symbol
+			// do this only once.
+			const randomIndex = Math.floor(Math.random() * length);
+			const randomUppercaseIndex = Math.floor(
+				Math.random() * uppercaseLetters.length
 			);
-		}
-
-		if (
-			(includeNumbers && !result.match(/\d/)) ||
-			(includeSymbols && !result.match(/[!@#$%&*]/)) ||
-			(includeUppercase && !result.match(/[A-Z]/))
-		) {
-			return generatePassword(
-				length,
-				includeNumbers,
-				includeSymbols,
-				includeUppercase
+			const randomUppercase = uppercaseLetters[randomUppercaseIndex];
+			const randomSymbolIndex = Math.floor(
+				Math.random() * symbols.length
 			);
+			const randomSymbol = symbols[randomSymbolIndex];
+			result =
+				hashSubstring.substring(0, randomIndex) +
+				randomUppercase +
+				randomSymbol +
+				hashSubstring.substring(randomIndex + 2);
+			console.log(
+				result,
+				randomIndex,
+				randomSymbolIndex,
+				randomUppercase,
+				randomSymbol,
+				hashSubstring
+			);
+		} else if (includeSymbols && !includeUppercase) {
+			// find a random number between 0 and length
+			// replace that character with a random symbol
+			// do this only once.
+			const randomIndex = Math.floor(Math.random() * length);
+			const randomSymbolIndex = Math.floor(
+				Math.random() * symbols.length
+			);
+			const randomSymbol = symbols[randomSymbolIndex];
+			result =
+				hashSubstring.substring(0, randomIndex) +
+				randomSymbol +
+				hashSubstring.substring(randomIndex + 1);
+		} else if (includeUppercase && !includeSymbols) {
+			// find a random number between 0 and length
+			// replace that character with a random uppercase letter
+			// do this only once.
+			const randomIndex = Math.floor(Math.random() * length);
+			const randomUppercaseIndex = Math.floor(
+				Math.random() * uppercaseLetters.length
+			);
+			const randomUppercase = uppercaseLetters[randomUppercaseIndex];
+			result =
+				hashSubstring.substring(0, randomIndex) +
+				randomUppercase +
+				hashSubstring.substring(randomIndex + 1);
+		} else {
+			result = hashSubstring;
 		}
-
+		// console.log(result);
+		// if (
+		// 	(includeSymbols && !result.match(/[!@#$%&*]/)) ||
+		// 	(includeUppercase && !result.match(/[A-Z]/))
+		// ) {
+		// 	return generatePassword(
+		// 		length,
+		// 		includeSymbols,
+		// 		includeUppercase,
+		// 		base_hash_string
+		// 	);
+		// }
 		return result;
 	};
 	function onGeneratePasswordClick() {
 		const password = generatePassword(
 			passwordLength,
-			includeNumbers,
 			includeSymbols,
-			includeUppercase
+			includeUppercase,
+			base_hash_string
 		);
+		console.log(password);
 		setPassword(password);
 	}
 
@@ -87,6 +132,21 @@ const Hashed = () => {
 
 	return (
 		<div className="overflow-hidden">
+			<dialog id="my_modal_3" className="modal">
+				<form method="dialog" className="modal-box">
+					<button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+						✕
+					</button>
+					<h3 className="font-bold text-3xl">Give some Text!</h3>
+					<p className="py-4 text-2xl">
+						Please Enter some text to hash first, so we can generate
+						a password for you!
+					</p>
+				</form>
+				<form method="dialog" className="modal-backdrop">
+					<button>close</button>
+				</form>
+			</dialog>
 			<div className="flex justify-center p-4">
 				<div className="text-base-content text-5xl p-4">
 					Create A Random Password
@@ -103,18 +163,21 @@ const Hashed = () => {
 						</div>
 					</div>
 					<div className="flex justify-center flex-col items-center">
-						<div className="flex justify-between w-96 items-center">
-							<span className=" text-3xl m-4 label-text">
-								Include Numbers
+						<div className="flex flex-col justify-between w-96 items-center">
+							<span className=" text-3xl m-4 label-text text-center w-full">
+								What do you wanna hash?
 							</span>
 							<input
-								type="checkbox"
-								className="toggle toggle-lg toggle-primary"
-								name="includeNumbers"
-								checked={includeNumbers}
-								onChange={handleCheckboxChange}
+								type="text"
+								placeholder="Type here"
+								value={base_hash_string}
+								onChange={(e) =>
+									setBaseHashString(e.target.value)
+								}
+								className="input input-bordered input-lg w-full max-w-xs"
 							/>
 						</div>
+
 						<div className="flex justify-between w-96 items-center">
 							<span className=" text-3xl m-4 label-text">
 								Include Symbols
@@ -150,7 +213,7 @@ const Hashed = () => {
 						<div>
 							<input
 								type="range"
-								min={0}
+								min={4}
 								max="16"
 								value={passwordLength}
 								className="range w-80 mt-4"
@@ -158,7 +221,6 @@ const Hashed = () => {
 								onChange={handlePasswordLengthChange}
 							/>
 							<div className="w-80 flex justify-between text-xs px-1">
-								<span>|</span>
 								<span>|</span>
 								<span>|</span>
 								<span>|</span>
