@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import sha256 from "js-sha256";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { CheckBadgeIcon, CheckIcon } from "@heroicons/react/24/solid";
 
 const Hashed = () => {
 	const [includeSymbols, setIncludeSymbols] = useState(false);
@@ -8,6 +8,7 @@ const Hashed = () => {
 	const [passwordLength, setPasswordLength] = useState(8);
 	const [base_hash_string, setBaseHashString] = useState();
 	const [password, setPassword] = useState("Generate!");
+	const [whichth_position, setWhichthPosition] = useState(0);
 
 	const handleCheckboxChange = (event) => {
 		const { name, checked } = event.target;
@@ -22,30 +23,70 @@ const Hashed = () => {
 				break;
 		}
 	};
-
 	const handlePasswordLengthChange = (event) => {
 		setPasswordLength(event.target.value);
+		regenerate_password(
+			parseInt(event.target.value),
+			parseInt(whichth_position)
+		);
 	};
+	const handleWhichthPositionChanger = (event) => {
+		setWhichthPosition(() => {
+			regenerate_password(
+				parseInt(passwordLength),
+				parseInt(event.target.value)
+			);
+			return parseInt(event.target.value);
+		});
+	};
+
+	const regenerate_password = (
+		updated_password_length,
+		updated_whichth_pos
+	) => {
+		const password = generatePassword(
+			updated_password_length,
+			includeSymbols,
+			includeUppercase,
+			base_hash_string,
+			updated_whichth_pos
+		);
+		if (password) {
+			setPassword(password);
+		}
+	};
+
 	const generatePassword = (
 		length,
 		includeSymbols,
 		includeUppercase,
-		base_hash_string
+		base_hash_string,
+		updated_whichth_pos
 	) => {
-		console.log(includeUppercase, includeSymbols, base_hash_string);
 		if (base_hash_string === undefined) {
 			// base_hash_string = "password"
 			window.my_modal_3.showModal();
 			return;
 		}
+		if (updated_whichth_pos === undefined) {
+			updated_whichth_pos = 0;
+		}
+		console.log(includeUppercase, includeSymbols, base_hash_string);
 		let result = "";
+		let hashSubstring = "";
 		const uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		const symbols = "!@#$%&*";
 
 		const hash = sha256(base_hash_string);
-		const hashSubstring = hash.substring(hash.length - length);
-		console.log(hash);
-		console.log(hashSubstring);
+
+		// use whichth position here to take a substring only from that position
+		hashSubstring = hash.substring(
+			updated_whichth_pos * length,
+			(updated_whichth_pos + 1) * length
+		);
+		// const hashSubstring = hash.substring(hash.length - length);
+		console.log(hash, length, updated_whichth_pos);
+		console.log("this substring is: ", hashSubstring);
 		if (includeSymbols && includeUppercase) {
 			// find a random number between 0 and length
 			// replace that character with a random uppercase letter
@@ -124,10 +165,15 @@ const Hashed = () => {
 			base_hash_string
 		);
 		if (password) {
+			console.log(password);
 			setPassword(password);
+			// enable the whichthpositionslider
+			const whichth_position_slider = document.querySelector(
+				"#whichth_position_slider"
+			);
+			whichth_position_slider.disabled = false;
 		}
 	}
-
 	function onClickCopyPassword() {
 		navigator.clipboard.writeText(password);
 		// show the toast
@@ -249,22 +295,35 @@ const Hashed = () => {
 					</div>
 				</div>
 				{/* display password */}
-				<div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-fit">
+				<div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-fit items-center flex flex-col align-middle">
 					<div className="flex justify-center p-4 flex-col align-middle items-center">
-						<div className="text-base-content text-5xl p-4">
+						<div className="text-base-content text-5xl p-4 text-center">
 							Your Generated Password :
-						</div>
-						<div className="text-base-content text-2xl p-4 text-center">
-							This password is the hash of the text you entered,
-							along with some letters substituted with symbols and
-							uppercase letters, if you included them. This is a
-							secure password, but you can always generate a new
-							one if you don't like it.
 						</div>
 					</div>
 					<div className="flex justify-center p-4">
 						<div className="text-neutral-content text-5xl p-8 bg-neutral rounded-full text-center self-center place-items-center place-self-center min-w-fit">
 							{password}
+						</div>
+					</div>
+					<div className="flex flex-col gap-2 w-5/6">
+						<input
+							type="range"
+							id="whichth_position_slider"
+							min={0}
+							max={Math.floor(64 / passwordLength) - 1}
+							value={whichth_position}
+							className="range w-full mt-4"
+							step={1}
+							onChange={handleWhichthPositionChanger}
+							disabled={true}
+						/>
+						<div className="w-full flex justify-between text-xs px-2">
+							{[...Array(Math.floor(64 / passwordLength))].map(
+								(_, i) => (
+									<span key={i}>|</span>
+								)
+							)}
 						</div>
 					</div>
 					<div className="flex justify-center">
@@ -274,6 +333,18 @@ const Hashed = () => {
 						>
 							Copy to Clipboard
 						</button>
+					</div>
+					<div className="flex justify-center p-4 flex-col align-middle items-center">
+						<div className="text-base-content text-2xl p-4 text-center">
+							This password is the
+							<span className="text-primary">SHA256 hash </span>of
+							the text you entered, along with some letters
+							substituted with symbols and uppercase letters, if
+							you included them. This is a secure password, but
+							you can always generate a new one if you don't like
+							it. As you slide the slider, you will move across
+							the hash, thereby generating new passwords.
+						</div>
 					</div>
 				</div>
 			</div>

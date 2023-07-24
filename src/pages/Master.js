@@ -25,18 +25,31 @@ const Master = () => {
 	};
 	const handlePasswordLengthChange = (event) => {
 		setPasswordLength(event.target.value);
+		regenerate_password(
+			parseInt(event.target.value),
+			parseInt(whichth_position)
+		);
 	};
 	const handleWhichthPositionChanger = (event) => {
-		setWhichthPosition(event.target.value);
-		regenerate_password();
+		setWhichthPosition(() => {
+			regenerate_password(
+				parseInt(passwordLength),
+				parseInt(event.target.value)
+			);
+			return parseInt(event.target.value);
+		});
 	};
 
-	const regenerate_password = () => {
+	const regenerate_password = (
+		updated_password_length,
+		updated_whichth_pos
+	) => {
 		const password = generatePassword(
-			passwordLength,
+			updated_password_length,
 			includeSymbols,
 			includeUppercase,
-			base_hash_string
+			base_hash_string,
+			updated_whichth_pos
 		);
 		if (password) {
 			setPassword(password);
@@ -47,8 +60,12 @@ const Master = () => {
 		length,
 		includeSymbols,
 		includeUppercase,
-		base_hash_string
+		base_hash_string,
+		updated_whichth_pos
 	) => {
+		if (updated_whichth_pos === undefined) {
+			updated_whichth_pos = 0;
+		}
 		console.log(includeUppercase, includeSymbols, base_hash_string);
 		if (base_hash_string === undefined) {
 			// base_hash_string = "password"
@@ -56,21 +73,20 @@ const Master = () => {
 			return;
 		}
 		let result = "";
+		let hashSubstring = "";
 		const uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		const symbols = "!@#$%&*";
 
 		const hash = sha256(base_hash_string);
 
 		// use whichth position here to take a substring only from that position
-		const multiplier = Math.floor(64 / length);
-		console.log(multiplier);
-		const hashSubstring = hash.substring(
-			whichth_position * multiplier,
-			(whichth_position + 1) * multiplier
+		hashSubstring = hash.substring(
+			updated_whichth_pos * length,
+			(updated_whichth_pos + 1) * length
 		);
 		// const hashSubstring = hash.substring(hash.length - length);
-		console.log(hash);
-		console.log(hashSubstring);
+		console.log(hash, length, updated_whichth_pos);
+		console.log("this substring is: ", hashSubstring);
 		if (includeSymbols && includeUppercase) {
 			// find a random number between 0 and length
 			// replace that character with a random uppercase letter
@@ -281,15 +297,8 @@ const Master = () => {
 				{/* display password */}
 				<div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-fit items-center flex flex-col align-middle">
 					<div className="flex justify-center p-4 flex-col align-middle items-center">
-						<div className="text-base-content text-5xl p-4">
+						<div className="text-base-content text-5xl p-4 text-center">
 							Your Generated Password :
-						</div>
-						<div className="text-base-content text-2xl p-4 text-center">
-							This password is the hash of the text you entered,
-							along with some letters substituted with symbols and
-							uppercase letters, if you included them. This is a
-							secure password, but you can always generate a new
-							one if you don't like it.
 						</div>
 					</div>
 					<div className="flex justify-center p-4">
@@ -302,7 +311,7 @@ const Master = () => {
 							type="range"
 							id="whichth_position_slider"
 							min={0}
-							max={Math.floor(64 / passwordLength)}
+							max={Math.floor(64 / passwordLength) - 1}
 							value={whichth_position}
 							className="range w-full mt-4"
 							step={1}
@@ -325,8 +334,21 @@ const Master = () => {
 							Copy to Clipboard
 						</button>
 					</div>
+					<div className="flex justify-center p-4 flex-col align-middle items-center">
+						<div className="text-base-content text-2xl p-4 text-center">
+							This password is the
+							<span className="text-primary">SHA256 hash </span>of
+							the text you entered, along with some letters
+							substituted with symbols and uppercase letters, if
+							you included them. This is a secure password, but
+							you can always generate a new one if you don't like
+							it. As you slide the slider, you will move across
+							the hash, thereby generating new passwords.
+						</div>
+					</div>
 				</div>
 			</div>
+
 			<div className="toast toast-end duration-300 transform-gpu ease-in-out hidden">
 				<div className="alert alert-success">
 					<span className="flex items-center gap-4 text-2xl">
