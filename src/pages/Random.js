@@ -95,7 +95,7 @@ const Random = () => {
 	return (
 		<div className="overflow-hidden">
 			<div className="flex justify-center p-4">
-				<div className="text-base-content text-5xl p-4">
+				<div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline m-4">
 					Create A Random Password
 				</div>
 			</div>

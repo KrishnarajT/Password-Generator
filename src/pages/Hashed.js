@@ -202,8 +202,9 @@ const Hashed = () => {
 				</form>
 			</dialog>
 			<div className="flex justify-center p-4">
-				<div className="text-base-content text-5xl p-4">
-					Create A Random Password
+				<div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline m-4">
+					Create A <span className="text-primary">SHA256</span> Hashed
+					Password
 				</div>
 			</div>
 
@@ -336,7 +337,7 @@ const Hashed = () => {
 					</div>
 					<div className="flex justify-center p-4 flex-col align-middle items-center">
 						<div className="text-base-content text-2xl p-4 text-center">
-							This password is the
+							This password is the{" "}
 							<span className="text-primary">SHA256 hash </span>of
 							the text you entered, along with some letters
 							substituted with symbols and uppercase letters, if

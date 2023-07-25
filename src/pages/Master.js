@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import sha256 from "js-sha256";
-import { CheckBadgeIcon, CheckIcon } from "@heroicons/react/24/solid";
+import {
+	CheckBadgeIcon,
+	CheckIcon,
+	EyeIcon,
+	EyeSlashIcon,
+	InformationCircleIcon,
+} from "@heroicons/react/24/solid";
 
 const Master = () => {
 	const [includeSymbols, setIncludeSymbols] = useState(false);
@@ -9,6 +15,8 @@ const Master = () => {
 	const [base_hash_string, setBaseHashString] = useState();
 	const [password, setPassword] = useState("Generate!");
 	const [whichth_position, setWhichthPosition] = useState(0);
+	const [passwordHidden, setPasswordHidden] = useState(true);
+	const [master_password, setMasterPassword] = useState();
 
 	const handleCheckboxChange = (event) => {
 		const { name, checked } = event.target;
@@ -49,7 +57,8 @@ const Master = () => {
 			includeSymbols,
 			includeUppercase,
 			base_hash_string,
-			updated_whichth_pos
+			updated_whichth_pos,
+			master_password
 		);
 		if (password) {
 			setPassword(password);
@@ -61,23 +70,43 @@ const Master = () => {
 		includeSymbols,
 		includeUppercase,
 		base_hash_string,
-		updated_whichth_pos
+		updated_whichth_pos,
+		master_password
 	) => {
 		if (updated_whichth_pos === undefined) {
 			updated_whichth_pos = 0;
 		}
 		console.log(includeUppercase, includeSymbols, base_hash_string);
-		if (base_hash_string === undefined) {
+		if (base_hash_string === undefined || master_password === undefined) {
 			// base_hash_string = "password"
 			window.my_modal_3.showModal();
 			return;
 		}
+		let interleaved_string = "";
+		// interleave the master password and the base_hash_string starting with the master password
+		for (let i = 0; i < master_password.length; i++) {
+			interleaved_string += master_password[i];
+			interleaved_string += base_hash_string[i];
+		}
+		// if the master password is longer than the base_hash_string, then add the rest of the master password
+		if (master_password.length > base_hash_string.length) {
+			interleaved_string += master_password.substring(
+				base_hash_string.length
+			);
+		}
+		// if the base_hash_string is longer than the master password, then add the rest of the base_hash_string
+		if (base_hash_string.length > master_password.length) {
+			interleaved_string += base_hash_string.substring(
+				master_password.length
+			);
+		}
+		console.log(interleaved_string);
 		let result = "";
 		let hashSubstring = "";
 		const uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		const symbols = "!@#$%&*";
 
-		const hash = sha256(base_hash_string);
+		const hash = sha256(interleaved_string);
 
 		// use whichth position here to take a substring only from that position
 		hashSubstring = hash.substring(
@@ -162,7 +191,9 @@ const Master = () => {
 			passwordLength,
 			includeSymbols,
 			includeUppercase,
-			base_hash_string
+			base_hash_string,
+			whichth_position,
+			master_password
 		);
 		if (password) {
 			console.log(password);
@@ -202,8 +233,8 @@ const Master = () => {
 				</form>
 			</dialog>
 			<div className="flex justify-center p-4">
-				<div className="text-base-content text-5xl p-4">
-					Create A Random Password
+				<div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline m-4">
+					Create Many Passwords from a Master Password
 				</div>
 			</div>
 
@@ -217,13 +248,53 @@ const Master = () => {
 						</div>
 					</div>
 					<div className="flex justify-center flex-col items-center">
-						<div className="flex flex-col justify-between w-96 items-center">
-							<span className=" text-3xl m-4 label-text text-center w-full">
-								What do you wanna hash?
+						<div className="flex flex-col justify-between w-full items-center">
+							<span className=" text-3xl m-4 label-text text-center w-2/3">
+								Enter your Master Password. Make sure to
+								remember it well.
+							</span>
+							<div className="flex w-96 justify-between items-center">
+								<input
+									id="master_password_input"
+									type="password"
+									placeholder="Enter Master Password"
+									value={master_password}
+									onChange={(e) =>
+										setMasterPassword(e.target.value)
+									}
+									className="input input-bordered input-lg w-full max-w-xs"
+								/>
+								<button
+									onClick={() => {
+										setPasswordHidden((prev) => {
+											const master_password_input =
+												document.querySelector(
+													"#master_password_input"
+												);
+											master_password_input.type =
+												passwordHidden
+													? "text"
+													: "password";
+											return !prev;
+										});
+									}}
+								>
+									{passwordHidden ? (
+										<EyeSlashIcon className="w-8 h-8" />
+									) : (
+										<EyeIcon className="w-8 h-8" />
+									)}
+								</button>
+							</div>
+						</div>
+						<div className="flex flex-col justify-between w-full items-center">
+							<span className=" text-3xl m-4 label-text text-center w-2/3">
+								What is this password for? or enter any Unique
+								identifier.
 							</span>
 							<input
 								type="text"
-								placeholder="Type here"
+								placeholder="Enter Identifier"
 								value={base_hash_string}
 								onChange={(e) =>
 									setBaseHashString(e.target.value)
@@ -334,17 +405,15 @@ const Master = () => {
 							Copy to Clipboard
 						</button>
 					</div>
-					<div className="flex justify-center p-4 flex-col align-middle items-center">
-						<div className="text-base-content text-2xl p-4 text-center">
-							This password is the
-							<span className="text-primary">SHA256 hash </span>of
-							the text you entered, along with some letters
-							substituted with symbols and uppercase letters, if
-							you included them. This is a secure password, but
-							you can always generate a new one if you don't like
-							it. As you slide the slider, you will move across
-							the hash, thereby generating new passwords.
-						</div>
+					<div className="flex justify-center">
+						<button
+							className="hover:scale-110 rubik m-4 mt-8 duration-200 transform-gpu"
+							onClick={() => {
+								window.location.href = "#how";
+							}}
+						>
+							<InformationCircleIcon className="w-10 h-10" />
+						</button>
 					</div>
 				</div>
 			</div>
@@ -355,6 +424,130 @@ const Master = () => {
 						<CheckBadgeIcon className="w-10 h-10" />
 						Copied to Clipboard!
 					</span>
+				</div>
+			</div>
+			<div
+				className="flex justify-center p-4 flex-col align-middle items-center"
+				id="how"
+			>
+				<div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline">
+					How does it work?
+				</div>
+				<div className="flex justify-center p-8 flex-col align-middle items-center">
+					<div className="text-base-content text-3xl p-8 bg-base-200 rounded-3xl">
+						This password is the{" "}
+						<span className="text-secondary">SHA256 hash </span>of
+						the text you entered, along with some letters
+						substituted with symbols and uppercase letters, if you
+						included them. This is a secure password, but you can
+						always generate a new one if you don't like it. As you
+						slide the slider, you will move across the hash, thereby
+						generating new passwords.
+						<br></br>
+						<br></br>
+						The Advantage of using this method is that you only need
+						to bother to remember your master password. The rest you
+						can always come back and calculate on this website. Even
+						if you do not have access to this website for whatsoever
+						reason, you can always calculate the password yourself,
+						as long as you remember your master password.
+					</div>
+
+					<div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline m-8">
+						Method
+					</div>
+					<div className="text-base-content text-3xl p-8 bg-base-200 rounded-3xl">
+						<ol>
+							<li>1. Your Master password is taken.</li>
+							<li>
+								2. It is interleaved with the text you entered
+								as the identifier. This text could be the name
+								of the website, or anything else that you can
+								remember.
+							</li>
+							<li>
+								3. The SHA256 hash of this interleaved string is
+								taken.
+							</li>
+							<li>
+								4. The hash is then split into chunks of length
+								equal to the password length you chose.
+							</li>
+							<li>
+								5. The chunk at the position you chose is taken.
+							</li>
+							<li>
+								6. If you chose to include symbols and uppercase
+								letters, then a random symbol and a random
+								uppercase letter is inserted, both at random
+								positions in the chunk.
+							</li>
+							<li>7. The resulting string is your password.</li>
+						</ol>
+					</div>
+
+					<div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline m-8">
+						Example
+					</div>
+					<div className="text-base-content text-3xl p-8 bg-base-200 rounded-3xl flex flex-col w-full items-center justify-center align-middle">
+						<ol className="flex flex-col items-start justify-start text-left gap-6 w-full">
+							<li>
+								1. Master Password:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									rabbit
+								</div>
+							</li>
+							<li>
+								2. Identifier:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									amazon
+								</div>
+							</li>
+							<li>
+								3. Interleaved String:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									raambabziotn
+								</div>
+							</li>
+							<li>
+								4. SHA256 Hash:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									0d1ec65aa08aa40689de70630debb86b47a92f744f9f0d130087d2630e653507
+								</div>
+							</li>
+							<li>
+								5. Split into chunks of length 8:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									0d1ec65a, a08aa406, 89de7063, 0debb86b,
+									47a92f74, 4f9f0d13, 0087d263, 0e653507
+								</div>
+							</li>
+							<li>
+								6. Chunk at position 0:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									0d1ec65a
+								</div>
+							</li>
+							<li>
+								7. Insert random symbol and uppercase letter:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									0d1ec65a
+								</div>
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									!
+								</div>
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									A
+								</div>
+							</li>
+							<li>
+								8. Resulting String:{" "}
+								<div className="text-secondary-content victormono p-4 px-8 outline m-4 rounded-full w-fit bg-secondary">
+									0dAe!65a
+								</div>
+							</li>
+						</ol>
+					</div>
 				</div>
 			</div>
 		</div>
