@@ -231,9 +231,9 @@ const Master = () => {
       </div>
 
       {/* main content.  */}
-      <div className="flex flex-row min-h-fit gap-24 justify-evenly">
+      <div className="flex lg:flex-row min-h-fit lg:gap-24 lg:justify-evenly flex-col gap-4">
         {/* tweak params */}
-        <div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-fit">
+        <div className="outline p-4 flex-1 m-16 rounded-3xl outline-secondary h-fit ">
           <div className="flex justify-center p-4">
             <div className="text-base-content text-5xl p-4">
               Tweak Input Parameters
@@ -403,7 +403,7 @@ const Master = () => {
         </div>
       </div>
       <div
-        className="flex justify-center p-4 flex-col align-middle items-center"
+        className="flex justify-center p-4 flex-col align-middle items-center md:bg-blue-500 break-all"
         id="how"
       >
         <div className="text-base-content text-5xl p-4 text-center rounded-full px-16 outline-secondary outline">
